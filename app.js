@@ -1,123 +1,159 @@
-// ========================================
-// CODE AI WEBSITE BUILDER
-// ========================================
-
-let project = {
-
+let websiteData = {
   html: "",
-
   css: "",
+  js: ""
+};
 
-  js: "",
+let currentCodeType = "html";
 
-  title: "AI Website"
 
+// ==========================================
+// TAB SYSTEM
+// ==========================================
+
+const websiteTab =
+  document.getElementById("websiteTab");
+
+const videoTab =
+  document.getElementById("videoTab");
+
+const websiteSection =
+  document.getElementById(
+    "websiteSection"
+  );
+
+const videoSection =
+  document.getElementById(
+    "videoSection"
+  );
+
+websiteTab.onclick = () => {
+
+  websiteSection.classList.remove(
+    "hidden"
+  );
+
+  videoSection.classList.add(
+    "hidden"
+  );
+
+  websiteTab.classList.add(
+    "active"
+  );
+
+  videoTab.classList.remove(
+    "active"
+  );
+};
+
+videoTab.onclick = () => {
+
+  websiteSection.classList.add(
+    "hidden"
+  );
+
+  videoSection.classList.remove(
+    "hidden"
+  );
+
+  websiteTab.classList.remove(
+    "active"
+  );
+
+  videoTab.classList.add(
+    "active"
+  );
 };
 
 
-// ========================================
-// ELEMENTS
-// ========================================
+// ==========================================
+// WEBSITE AI
+// ==========================================
 
 const promptInput =
-  document.getElementById("prompt");
+  document.getElementById(
+    "prompt"
+  );
 
 const generateBtn =
-  document.getElementById("generateBtn");
+  document.getElementById(
+    "generateBtn"
+  );
 
-const newBtn =
-  document.getElementById("newBtn");
-
-const downloadBtn =
-  document.getElementById("downloadBtn");
+const chat =
+  document.getElementById(
+    "chat"
+  );
 
 const preview =
-  document.getElementById("preview");
+  document.getElementById(
+    "preview"
+  );
 
-const code =
-  document.getElementById("code");
-
-const messages =
-  document.getElementById("messages");
-
-const status =
-  document.getElementById("status");
+const codeOutput =
+  document.getElementById(
+    "codeOutput"
+  );
 
 
-// ========================================
-// ADD CHAT MESSAGE
-// ========================================
-
-function addMessage(type, text) {
+function addMessage(
+  text,
+  type
+) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.className =
-    `message ${type}`;
+    type === "user"
+      ? "user-message"
+      : "ai-message";
 
-  div.innerHTML = `
+  div.textContent = text;
 
-    <div class="messageTitle">
-      ${type === "ai" ? "🤖 CODE AI" : "👤 You"}
-    </div>
+  chat.appendChild(div);
 
-    <p>${escapeHTML(text)}</p>
-
-  `;
-
-  messages.appendChild(div);
-
-  messages.scrollTop =
-    messages.scrollHeight;
-
+  chat.scrollTop =
+    chat.scrollHeight;
 }
 
 
-// ========================================
-// ESCAPE HTML
-// ========================================
+function updateCode() {
 
-function escapeHTML(text) {
+  if (
+    currentCodeType === "html"
+  ) {
 
-  return String(text)
-
-    .replace(/&/g, "&amp;")
-
-    .replace(/</g, "&lt;")
-
-    .replace(/>/g, "&gt;")
-
-    .replace(/"/g, "&quot;")
-
-    .replace(/'/g, "&#039;");
-
-}
-
-
-// ========================================
-// UPDATE STATUS
-// ========================================
-
-function setStatus(text) {
-
-  if (status) {
-
-    status.textContent = text;
+    codeOutput.textContent =
+      websiteData.html ||
+      "No HTML generated.";
 
   }
 
+  else if (
+    currentCodeType === "css"
+  ) {
+
+    codeOutput.textContent =
+      websiteData.css ||
+      "No CSS generated.";
+
+  }
+
+  else {
+
+    codeOutput.textContent =
+      websiteData.js ||
+      "No JavaScript generated.";
+  }
 }
 
 
-// ========================================
-// CREATE PREVIEW
-// ========================================
+function showPreview() {
 
-function renderPreview() {
-
-  const fullPage = `
-
+  const documentContent = `
 <!DOCTYPE html>
 
 <html>
@@ -126,14 +162,14 @@ function renderPreview() {
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>${escapeHTML(project.title)}</title>
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
 
 <style>
 
-${project.css}
+${websiteData.css}
 
 </style>
 
@@ -141,253 +177,134 @@ ${project.css}
 
 <body>
 
-${project.html}
+${websiteData.html}
 
 <script>
 
-${project.js}
+${websiteData.js}
 
 <\/script>
 
 </body>
 
 </html>
-
 `;
 
-
   preview.srcdoc =
-    fullPage;
-
+    documentContent;
 }
 
 
-// ========================================
-// SHOW CODE
-// ========================================
+generateBtn.onclick =
+  async () => {
 
-function showCode(tab) {
+    const prompt =
+      promptInput.value.trim();
 
-  let text = "";
+    if (!prompt) {
 
-
-  if (tab === "html") {
-
-    text = project.html;
-
-  }
-
-
-  if (tab === "css") {
-
-    text = project.css;
-
-  }
-
-
-  if (tab === "js") {
-
-    text = project.js;
-
-  }
-
-
-  code.innerHTML =
-    escapeHTML(text || "No code generated yet.");
-
-}
-
-
-// ========================================
-// GENERATE WEBSITE
-// ========================================
-
-async function generateWebsite() {
-
-  const prompt =
-    promptInput.value.trim();
-
-
-  if (!prompt) {
-
-    alert(
-      "Bhai pehle website ka prompt likho."
-    );
-
-    promptInput.focus();
-
-    return;
-
-  }
-
-
-  // Disable button
-
-  generateBtn.disabled = true;
-
-  generateBtn.textContent =
-    "⏳ Generating...";
-
-
-  setStatus(
-    "Gemini AI website bana raha hai..."
-  );
-
-
-  addMessage(
-    "user",
-    prompt
-  );
-
-
-  try {
-
-    const response =
-      await fetch("/api/generate", {
-
-        method: "POST",
-
-        headers: {
-
-          "Content-Type":
-            "application/json"
-
-        },
-
-        body: JSON.stringify({
-
-          prompt: prompt,
-
-          current: project.html
-            ? project
-            : null
-
-        })
-
-      });
-
-
-    const data =
-      await response.json();
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        data.error ||
-        "Server error"
+      alert(
+        "Pehle website request likho."
       );
 
+      return;
     }
 
-
-    // ========================================
-    // SAVE PROJECT
-    // ========================================
-
-    project.html =
-      data.html || "";
-
-    project.css =
-      data.css || "";
-
-    project.js =
-      data.js || "";
-
-    project.title =
-      data.title ||
-      "AI Website";
-
-
-    // ========================================
-    // RENDER
-    // ========================================
-
-    renderPreview();
-
-    showCode("html");
-
-
-    // ========================================
-    // MESSAGE
-    // ========================================
-
     addMessage(
-
-      "ai",
-
-      data.message ||
-      "Website successfully generated! 🚀"
-
+      prompt,
+      "user"
     );
-
-
-    setStatus(
-      "✅ Website ready"
-    );
-
-
-    // Clear prompt
-
-    promptInput.value = "";
-
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    addMessage(
-
-      "ai",
-
-      "❌ Error: " +
-      error.message
-
-    );
-
-
-    setStatus(
-      "❌ " + error.message
-    );
-
-
-    alert(
-      "Website generate nahi hui:\n\n" +
-      error.message
-    );
-
-
-  } finally {
 
     generateBtn.disabled =
-      false;
+      true;
 
     generateBtn.textContent =
-      "✨ Generate Website";
+      "⏳ Generating...";
 
-  }
+    addMessage(
+      "🤖 AI website bana raha hai...",
+      "ai"
+    );
 
-}
+    try {
+
+      const response =
+        await fetch(
+          "/api/generate",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              prompt,
+
+              current:
+                websiteData.html
+                  ? websiteData
+                  : null
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "Website generate nahi hui."
+        );
+      }
+
+      websiteData = {
+        html: data.html || "",
+        css: data.css || "",
+        js: data.js || ""
+      };
+
+      showPreview();
+
+      updateCode();
+
+      addMessage(
+        "✅ Website successfully generate ho gayi!",
+        "ai"
+      );
+
+      promptInput.value = "";
+
+    } catch (error) {
+
+      addMessage(
+        "❌ " + error.message,
+        "ai"
+      );
+
+      alert(
+        "Website generate nahi hui:\n\n" +
+        error.message
+      );
+
+    } finally {
+
+      generateBtn.disabled =
+        false;
+
+      generateBtn.textContent =
+        "🚀 Generate Website";
+    }
+  };
 
 
-// ========================================
-// GENERATE BUTTON
-// ========================================
-
-generateBtn.addEventListener(
-  "click",
-  generateWebsite
-);
-
-
-// ========================================
-// ENTER KEY
-// ========================================
-
+// Enter shortcut
 promptInput.addEventListener(
   "keydown",
-  (event) => {
+  event => {
 
     if (
       event.key === "Enter" &&
@@ -396,250 +313,358 @@ promptInput.addEventListener(
 
       event.preventDefault();
 
-      generateWebsite();
-
+      generateBtn.click();
     }
-
   }
 );
 
 
-// ========================================
-// NEW PROJECT
-// ========================================
+// Code tabs
+document
+  .querySelectorAll(".code-tab")
+  .forEach(button => {
 
-newBtn.addEventListener(
-  "click",
-  () => {
+    button.onclick = () => {
 
-    project = {
+      document
+        .querySelectorAll(
+          ".code-tab"
+        )
+        .forEach(btn =>
+          btn.classList.remove(
+            "active"
+          )
+        );
 
-      html: "",
+      button.classList.add(
+        "active"
+      );
 
-      css: "",
+      currentCodeType =
+        button.dataset.code;
 
-      js: "",
-
-      title: "AI Website"
-
+      updateCode();
     };
 
-
-    preview.srcdoc = "";
-
-    showCode("html");
+  });
 
 
-    messages.innerHTML = `
+// ==========================================
+// IMAGE UPLOAD
+// ==========================================
 
-      <div class="message ai">
+const dropArea =
+  document.getElementById(
+    "dropArea"
+  );
 
-        <div class="messageTitle">
-          🤖 CODE AI
-        </div>
+const imageInput =
+  document.getElementById(
+    "imageInput"
+  );
 
-        <p>
-          New project ready 🚀
-        </p>
+const imagePreview =
+  document.getElementById(
+    "imagePreview"
+  );
 
-        <p>
-          Batao kya website banani hai.
-        </p>
-
-      </div>
-
-    `;
+let selectedImage = null;
 
 
-    promptInput.value = "";
+dropArea.onclick = () => {
+  imageInput.click();
+};
 
-    setStatus("Ready");
 
+imageInput.onchange = () => {
+
+  if (
+    imageInput.files &&
+    imageInput.files[0]
+  ) {
+
+    selectedImage =
+      imageInput.files[0];
+
+    showImagePreview(
+      selectedImage
+    );
   }
+};
 
+
+function showImagePreview(
+  file
+) {
+
+  const url =
+    URL.createObjectURL(file);
+
+  imagePreview.src = url;
+
+  imagePreview.classList.remove(
+    "hidden"
+  );
+
+  document.getElementById(
+    "uploadText"
+  ).textContent =
+    "✅ Image selected: " +
+    file.name;
+}
+
+
+// Drag and drop
+dropArea.addEventListener(
+  "dragover",
+  event => {
+
+    event.preventDefault();
+
+    dropArea.style.borderColor =
+      "#7565ff";
+  }
 );
 
 
-// ========================================
-// DOWNLOAD WEBSITE
-// ========================================
-
-downloadBtn.addEventListener(
-  "click",
+dropArea.addEventListener(
+  "dragleave",
   () => {
 
-    if (!project.html) {
+    dropArea.style.borderColor =
+      "";
+  }
+);
+
+
+dropArea.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+
+    dropArea.style.borderColor =
+      "";
+
+    const file =
+      event.dataTransfer.files[0];
+
+    if (
+      file &&
+      file.type.startsWith(
+        "image/"
+      )
+    ) {
+
+      selectedImage = file;
+
+      showImagePreview(
+        file
+      );
+    }
+  }
+);
+
+
+// ==========================================
+// IMAGE → VIDEO
+// ==========================================
+
+const videoBtn =
+  document.getElementById(
+    "videoBtn"
+  );
+
+const videoPrompt =
+  document.getElementById(
+    "videoPrompt"
+  );
+
+const aspectRatio =
+  document.getElementById(
+    "aspectRatio"
+  );
+
+const videoStatus =
+  document.getElementById(
+    "videoStatus"
+  );
+
+const videoResult =
+  document.getElementById(
+    "videoResult"
+  );
+
+
+videoBtn.onclick =
+  async () => {
+
+    if (!selectedImage) {
 
       alert(
-        "Pehle website generate karo."
+        "Pehle image upload karo."
       );
 
       return;
-
     }
 
+    const prompt =
+      videoPrompt.value.trim() ||
+      "Create a realistic cinematic video from this image with natural movement and smooth camera motion.";
 
-    const finalHTML = `
+    const formData =
+      new FormData();
 
-<!DOCTYPE html>
+    formData.append(
+      "image",
+      selectedImage
+    );
 
-<html lang="en">
+    formData.append(
+      "prompt",
+      prompt
+    );
 
-<head>
+    formData.append(
+      "aspectRatio",
+      aspectRatio.value
+    );
 
-<meta charset="UTF-8">
+    videoBtn.disabled =
+      true;
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    videoBtn.textContent =
+      "⏳ Starting...";
 
-<title>${escapeHTML(project.title)}</title>
+    videoStatus.textContent =
+      "🚀 Video generation start ho rahi hai...";
 
-<style>
+    videoResult.textContent =
+      "⏳ AI video bana raha hai...";
 
-${project.css}
+    try {
 
-</style>
+      const response =
+        await fetch(
+          "/api/video",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
 
-</head>
+      const data =
+        await response.json();
 
-<body>
+      if (!response.ok) {
 
-${project.html}
+        throw new Error(
+          data.error ||
+          "Video start nahi hua."
+        );
+      }
 
-<script>
+      const jobId =
+        data.jobId;
 
-${project.js}
+      videoStatus.textContent =
+        "🎬 Video generate ho raha hai...";
 
-<\/script>
-
-</body>
-
-</html>
-
-`;
-
-
-    const blob =
-      new Blob(
-
-        [finalHTML],
-
-        {
-          type:
-            "text/html"
-        }
-
+      await checkVideoJob(
+        jobId
       );
 
+    } catch (error) {
 
-    const url =
-      URL.createObjectURL(blob);
+      videoStatus.textContent =
+        "❌ " +
+        error.message;
 
+      videoResult.textContent =
+        "Video generate nahi ho paya.";
 
-    const a =
-      document.createElement("a");
+    } finally {
 
+      videoBtn.disabled =
+        false;
 
-    a.href = url;
-
-    a.download =
-      "ai-website.html";
-
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    a.remove();
+      videoBtn.textContent =
+        "🚀 Generate Video";
+    }
+  };
 
 
-    URL.revokeObjectURL(url);
+// Check status
+async function checkVideoJob(
+  jobId
+) {
 
+  const response =
+    await fetch(
+      `/api/video/${jobId}`
+    );
+
+  const data =
+    await response.json();
+
+  if (data.status === "complete") {
+
+    videoStatus.textContent =
+      "🎉 Video successfully ready!";
+
+    videoResult.innerHTML = `
+      <div style="width:100%;text-align:center;">
+
+        <video
+          controls
+          autoplay
+          playsinline
+          src="${data.videoUrl}"
+        ></video>
+
+        <br>
+
+        <a
+          class="download-video"
+          href="${data.videoUrl}"
+          download="code-ai-video.mp4"
+        >
+          ⬇️ Download Video
+        </a>
+
+      </div>
+    `;
+
+    return;
   }
 
-);
 
+  if (data.status === "error") {
 
-// ========================================
-// CODE TABS
-// ========================================
-
-document
-  .querySelectorAll(".tab")
-  .forEach((tab) => {
-
-    tab.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(".tab")
-          .forEach((item) => {
-
-            item.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        tab.classList.add(
-          "active"
-        );
-
-
-        showCode(
-          tab.dataset.tab
-        );
-
-      }
+    throw new Error(
+      data.message ||
+      "Video generation failed."
     );
-
-  });
-
-
-// ========================================
-// DEVICE PREVIEW
-// ========================================
-
-document
-  .querySelectorAll(".device")
-  .forEach((device) => {
-
-    device.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(".device")
-          .forEach((item) => {
-
-            item.classList.remove(
-              "active"
-            );
-
-          });
+  }
 
 
-        device.classList.add(
-          "active"
-        );
+  videoStatus.textContent =
+    "⏳ " +
+    (data.message ||
+      "AI video bana raha hai...");
 
 
-        preview.style.width =
-          device.dataset.width;
+  // Check again after 10 seconds
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        10000
+      )
+  );
 
-      }
 
-    );
-
-  });
-
-
-// ========================================
-// INITIAL STATE
-// ========================================
-
-showCode("html");
-
-setStatus("Ready");
+  return checkVideoJob(
+    jobId
+  );
+}
