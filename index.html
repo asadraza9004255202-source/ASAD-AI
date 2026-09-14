@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>CODE AI</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+</head>
+
+<body>
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="topbar">
+
+    <div class="logo">
+      <span class="logoIcon">⚡</span>
+      <span>CODE</span>
+      <span class="logoAI">AI</span>
+    </div>
+
+    <div class="headerButtons">
+
+      <button
+        id="newBtn"
+        class="topBtn"
+      >
+        ＋ New
+      </button>
+
+      <button
+        id="downloadBtn"
+        class="topBtn downloadBtn"
+      >
+        ↓ Download
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= MAIN APP ================= -->
+
+  <main class="app">
+
+
+    <!-- ================= LEFT AI PANEL ================= -->
+
+    <aside class="chatPanel">
+
+      <div class="panelHeader">
+        <div class="panelTitle">
+          🤖 AI Website Builder
+        </div>
+      </div>
+
+
+      <!-- CHAT AREA -->
+
+      <div
+        id="messages"
+        class="messages"
+      >
+
+        <div class="message ai">
+
+          <div class="messageTitle">
+            Bhai 👋
+          </div>
+
+          <p>
+            Main tumhare liye website bana sakta hoon.
+          </p>
+
+          <p>
+            Example:
+          </p>
+
+          <div class="exampleBox">
+            "Ek modern gaming website banao
+            dark theme ke saath."
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- INPUT AREA -->
+
+      <div class="inputArea">
+
+        <textarea
+          id="prompt"
+          placeholder="Website kya banani hai? Example: Ek modern portfolio website banao..."
+          autocomplete="off"
+        ></textarea>
+
+
+        <button
+          id="generateBtn"
+          class="generateBtn"
+          type="button"
+        >
+          ✨ Generate Website
+        </button>
+
+
+        <div
+          id="status"
+          class="status"
+        >
+          Ready
+        </div>
+
+      </div>
+
+    </aside>
+
+
+
+    <!-- ================= CENTER PREVIEW ================= -->
+
+    <section class="previewPanel">
+
+      <div class="previewHeader">
+
+        <div class="previewTitle">
+          🌐 Live Preview
+        </div>
+
+
+        <div class="devices">
+
+          <button
+            class="device active"
+            data-width="100%"
+            type="button"
+          >
+            Desktop
+          </button>
+
+          <button
+            class="device"
+            data-width="768px"
+            type="button"
+          >
+            Tablet
+          </button>
+
+          <button
+            class="device"
+            data-width="390px"
+            type="button"
+          >
+            Mobile
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="previewContainer">
+
+        <iframe
+          id="preview"
+          title="Website Preview"
+          sandbox="allow-scripts allow-forms"
+        ></iframe>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ================= RIGHT CODE PANEL ================= -->
+
+    <aside class="codePanel">
+
+      <div class="panelHeader">
+
+        <div class="panelTitle">
+          💻 Generated Code
+        </div>
+
+      </div>
+
+
+      <!-- TABS -->
+
+      <div class="tabs">
+
+        <button
+          class="tab active"
+          data-tab="html"
+          type="button"
+        >
+          HTML
+        </button>
+
+        <button
+          class="tab"
+          data-tab="css"
+          type="button"
+        >
+          CSS
+        </button>
+
+        <button
+          class="tab"
+          data-tab="js"
+          type="button"
+        >
+          JavaScript
+        </button>
+
+      </div>
+
+
+      <!-- CODE -->
+
+      <pre id="code"><code>Generate a website to see the code here...</code></pre>
+
+    </aside>
+
+  </main>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>

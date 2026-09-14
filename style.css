@@ -1,0 +1,1026 @@
+/* =====================================================
+   CODE AI
+   FULL RESPONSIVE STYLE
+===================================================== */
+
+
+/* ================= GLOBAL ================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+
+  background: #0b0f14;
+  color: #ffffff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
+/* ================= TOP BAR ================= */
+
+.topbar {
+  width: 100%;
+  height: 64px;
+  min-height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 18px;
+
+  background: #10151e;
+
+  border-bottom: 1px solid #29313d;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 1000;
+}
+
+
+/* ================= LOGO ================= */
+
+.logo {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  font-size: 24px;
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
+}
+
+.logoIcon {
+  font-size: 28px;
+}
+
+.logoAI {
+  color: #756cff;
+}
+
+
+/* ================= HEADER BUTTONS ================= */
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.topBtn {
+  height: 42px;
+
+  padding: 0 15px;
+
+  border: 1px solid #303a49;
+  border-radius: 10px;
+
+  background: #1a2230;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.topBtn:hover {
+  background: #252f3d;
+
+  transform: translateY(-1px);
+}
+
+.downloadBtn {
+  background: #715cff;
+
+  border-color: #715cff;
+}
+
+.downloadBtn:hover {
+  background: #5e4be8;
+}
+
+
+/* =====================================================
+   MAIN APP
+===================================================== */
+
+.app {
+  width: 100%;
+
+  min-height: calc(100vh - 64px);
+
+  display: grid;
+
+  grid-template-columns:
+    300px
+    minmax(0, 1fr)
+    360px;
+
+  align-items: stretch;
+
+  overflow: visible;
+}
+
+
+/* =====================================================
+   COMMON PANEL
+===================================================== */
+
+.chatPanel,
+.previewPanel,
+.codePanel {
+  min-width: 0;
+  min-height: 0;
+
+  background: #0e131a;
+
+  border-right: 1px solid #29313d;
+}
+
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.panelHeader {
+  height: 58px;
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 16px;
+
+  background: #10151e;
+
+  border-bottom: 1px solid #29313d;
+}
+
+.panelTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   LEFT CHAT PANEL
+===================================================== */
+
+.chatPanel {
+  height: calc(100vh - 64px);
+
+  display: flex;
+  flex-direction: column;
+
+  position: sticky;
+  top: 64px;
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   CHAT MESSAGES
+===================================================== */
+
+.messages {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  padding: 18px 12px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scroll-behavior: smooth;
+}
+
+
+/* Scrollbar */
+
+.messages::-webkit-scrollbar,
+#code::-webkit-scrollbar,
+.previewContainer::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.messages::-webkit-scrollbar-track,
+#code::-webkit-scrollbar-track,
+.previewContainer::-webkit-scrollbar-track {
+  background: #0a0e13;
+}
+
+.messages::-webkit-scrollbar-thumb,
+#code::-webkit-scrollbar-thumb,
+.previewContainer::-webkit-scrollbar-thumb {
+  background: #343e4d;
+
+  border-radius: 10px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover,
+#code::-webkit-scrollbar-thumb:hover,
+.previewContainer::-webkit-scrollbar-thumb:hover {
+  background: #4b586b;
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.message {
+  width: 100%;
+
+  padding: 18px 14px;
+
+  margin-bottom: 14px;
+
+  border-radius: 13px;
+
+  background: #181e28;
+
+  border: 1px solid #252e3b;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  word-break: break-word;
+}
+
+.messageTitle {
+  margin-bottom: 12px;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.message p {
+  margin: 10px 0;
+}
+
+.exampleBox {
+  margin-top: 12px;
+
+  padding: 12px;
+
+  background: #10151d;
+
+  border: 1px solid #2b3543;
+
+  border-radius: 9px;
+
+  color: #d9deea;
+
+  line-height: 1.6;
+}
+
+
+/* User message */
+
+.message.user {
+  background: #211f45;
+
+  border-color: #4941a4;
+}
+
+
+/* =====================================================
+   INPUT AREA
+===================================================== */
+
+.inputArea {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  padding: 10px;
+
+  background: #10151e;
+
+  border-top: 1px solid #29313d;
+
+  position: relative;
+
+  z-index: 20;
+}
+
+
+/* =====================================================
+   TEXTAREA
+===================================================== */
+
+#prompt {
+  width: 100%;
+
+  height: 70px;
+
+  min-height: 70px;
+
+  max-height: 130px;
+
+  display: block;
+
+  resize: vertical;
+
+  padding: 11px 12px;
+
+  border: 1px solid #303a49;
+
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #0b0f14;
+
+  color: #ffffff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+#prompt:focus {
+  border-color: #715cff;
+
+  box-shadow:
+    0 0 0 2px rgba(113, 92, 255, 0.12);
+}
+
+#prompt::placeholder {
+  color: #778292;
+}
+
+
+/* =====================================================
+   GENERATE BUTTON
+===================================================== */
+
+.generateBtn {
+  width: 100%;
+
+  height: 44px;
+
+  min-height: 44px;
+
+  margin-top: 9px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #715cff;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  position: relative;
+
+  z-index: 30;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.generateBtn:hover {
+  background: #5e4be8;
+
+  transform: translateY(-1px);
+}
+
+.generateBtn:active {
+  transform: translateY(0);
+}
+
+.generateBtn:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status {
+  width: 100%;
+
+  min-height: 16px;
+
+  margin-top: 5px;
+
+  text-align: center;
+
+  color: #8b96a6;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   CENTER PREVIEW
+===================================================== */
+
+.previewPanel {
+  height: calc(100vh - 64px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  background: #080b10;
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   PREVIEW HEADER
+===================================================== */
+
+.previewHeader {
+  flex: 0 0 auto;
+
+  min-height: 58px;
+
+  padding: 0 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  background: #10151e;
+
+  border-bottom: 1px solid #29313d;
+}
+
+.previewTitle {
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   DEVICES
+===================================================== */
+
+.devices {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+}
+
+.device {
+  height: 34px;
+
+  padding: 0 11px;
+
+  border: 1px solid #303a49;
+
+  border-radius: 8px;
+
+  background: #1b2330;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.device:hover {
+  background: #283342;
+}
+
+.device.active {
+  background: #715cff;
+
+  border-color: #715cff;
+}
+
+
+/* =====================================================
+   PREVIEW CONTAINER
+===================================================== */
+
+.previewContainer {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  width: 100%;
+
+  padding: 18px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  overflow: auto;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #18212d 0%,
+      #080b10 55%
+    );
+}
+
+
+/* =====================================================
+   IFRAME
+===================================================== */
+
+#preview {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  min-width: 320px;
+
+  height: max(650px, calc(100vh - 140px));
+
+  border: 1px solid #303a49;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  display: block;
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.4);
+
+  transition:
+    width 0.3s ease;
+}
+
+
+/* =====================================================
+   RIGHT CODE PANEL
+===================================================== */
+
+.codePanel {
+  height: calc(100vh - 64px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-right: none;
+}
+
+
+/* =====================================================
+   CODE TABS
+===================================================== */
+
+.tabs {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  display: flex;
+
+  gap: 3px;
+
+  padding: 8px;
+
+  background: #10151e;
+
+  border-bottom: 1px solid #29313d;
+}
+
+.tab {
+  flex: 1;
+
+  height: 34px;
+
+  border: 1px solid transparent;
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #b5bdca;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.tab:hover {
+  background: #1b2330;
+
+  color: #ffffff;
+}
+
+.tab.active {
+  background: #22283a;
+
+  color: #8d7fff;
+
+  border-color: #2d3550;
+}
+
+
+/* =====================================================
+   CODE AREA
+===================================================== */
+
+#code {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  width: 100%;
+
+  margin: 0;
+
+  padding: 16px;
+
+  overflow: auto;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+
+  background: #090d12;
+
+  color: #d8deea;
+
+  font-family:
+    Consolas,
+    "Courier New",
+    monospace;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+  tab-size: 2;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .app {
+    grid-template-columns:
+      260px
+      minmax(0, 1fr)
+      310px;
+  }
+
+  .logo {
+    font-size: 21px;
+  }
+
+  .previewContainer {
+    padding: 12px;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL TABLET
+===================================================== */
+
+@media (max-width: 850px) {
+
+  body {
+    overflow-y: auto;
+  }
+
+  .app {
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: auto;
+
+    overflow: visible;
+  }
+
+
+  .chatPanel,
+  .previewPanel,
+  .codePanel {
+    width: 100%;
+
+    position: relative;
+
+    top: auto;
+
+    border-right: none;
+
+    border-bottom: 1px solid #29313d;
+  }
+
+
+  /* Chat */
+
+  .chatPanel {
+    height: 620px;
+
+    min-height: 620px;
+  }
+
+
+  /* Preview */
+
+  .previewPanel {
+    height: 700px;
+
+    min-height: 700px;
+  }
+
+
+  /* Code */
+
+  .codePanel {
+    height: 650px;
+
+    min-height: 650px;
+  }
+
+
+  .messages {
+    overflow-y: auto;
+  }
+
+
+  .previewContainer {
+    overflow: auto;
+  }
+
+
+  #preview {
+    height: 620px;
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+  .topbar {
+    height: auto;
+
+    min-height: 60px;
+
+    padding: 9px 10px;
+
+    gap: 8px;
+  }
+
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .logoIcon {
+    font-size: 21px;
+  }
+
+
+  .headerButtons {
+    gap: 5px;
+  }
+
+
+  .topBtn {
+    height: 36px;
+
+    padding: 0 9px;
+
+    font-size: 11px;
+  }
+
+
+  .app {
+    display: flex;
+
+    flex-direction: column;
+  }
+
+
+  /* Chat */
+
+  .chatPanel {
+    height: 620px;
+
+    min-height: 620px;
+  }
+
+
+  /* Preview */
+
+  .previewPanel {
+    height: 670px;
+
+    min-height: 670px;
+  }
+
+
+  /* Code */
+
+  .codePanel {
+    height: 620px;
+
+    min-height: 620px;
+  }
+
+
+  .panelHeader {
+    height: 54px;
+
+    min-height: 54px;
+
+    padding: 0 13px;
+  }
+
+
+  .panelTitle,
+  .previewTitle {
+    font-size: 14px;
+  }
+
+
+  .previewHeader {
+    min-height: 100px;
+
+    padding: 10px;
+
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  .devices {
+    width: 100%;
+  }
+
+
+  .device {
+    flex: 1;
+
+    text-align: center;
+  }
+
+
+  .previewContainer {
+    padding: 10px;
+  }
+
+
+  #preview {
+    min-width: 320px;
+
+    height: 580px;
+  }
+
+
+  #prompt {
+    height: 65px;
+
+    min-height: 65px;
+  }
+
+
+  .generateBtn {
+    height: 43px;
+
+    min-height: 43px;
+  }
+
+}
+
+
+/* =====================================================
+   VERY SMALL MOBILE
+===================================================== */
+
+@media (max-width: 380px) {
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logoIcon {
+    font-size: 19px;
+  }
+
+  .topBtn {
+    padding: 0 7px;
+
+    font-size: 10px;
+  }
+
+
+  .chatPanel {
+    height: 600px;
+
+    min-height: 600px;
+  }
+
+
+  .previewPanel {
+    height: 640px;
+
+    min-height: 640px;
+  }
+
+
+  .codePanel {
+    height: 580px;
+
+    min-height: 580px;
+  }
+
+}
