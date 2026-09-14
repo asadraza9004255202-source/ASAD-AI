@@ -1,6 +1,7 @@
 {
-  "name": "code-ai",
+  "name": "asad-ai",
   "version": "1.0.0",
+  "description": "AI Website Builder",
   "type": "module",
   "scripts": {
     "start": "node server.js"
