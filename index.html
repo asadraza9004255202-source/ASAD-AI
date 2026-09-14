@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
 
@@ -18,30 +19,26 @@
 
 <body>
 
-  <!-- ================= HEADER ================= -->
-
   <header class="topbar">
 
     <div class="logo">
-      <span class="logoIcon">⚡</span>
-      <span>CODE</span>
-      <span class="logoAI">AI</span>
+      ⚡ CODE <span>AI</span>
     </div>
 
-    <div class="headerButtons">
+    <div class="top-buttons">
 
       <button
-        id="newBtn"
-        class="topBtn"
+        id="websiteTab"
+        class="top-btn active"
       >
-        ＋ New
+        🌐 Website AI
       </button>
 
       <button
-        id="downloadBtn"
-        class="topBtn downloadBtn"
+        id="videoTab"
+        class="top-btn"
       >
-        ↓ Download
+        🎬 Image → Video
       </button>
 
     </div>
@@ -49,191 +46,222 @@
   </header>
 
 
-  <!-- ================= MAIN APP ================= -->
+  <!-- WEBSITE BUILDER -->
 
-  <main class="app">
+  <main
+    id="websiteSection"
+    class="section"
+  >
 
+    <div class="page-title">
+      🤖 AI Website Builder
+    </div>
 
-    <!-- ================= LEFT AI PANEL ================= -->
+    <div class="builder">
 
-    <aside class="chatPanel">
+      <section class="chat-panel">
 
-      <div class="panelHeader">
-        <div class="panelTitle">
-          🤖 AI Website Builder
+        <div class="panel-title">
+          🤖 CODE AI
         </div>
-      </div>
-
-
-      <!-- CHAT AREA -->
-
-      <div
-        id="messages"
-        class="messages"
-      >
-
-        <div class="message ai">
-
-          <div class="messageTitle">
-            Bhai 👋
-          </div>
-
-          <p>
-            Main tumhare liye website bana sakta hoon.
-          </p>
-
-          <p>
-            Example:
-          </p>
-
-          <div class="exampleBox">
-            "Ek modern gaming website banao
-            dark theme ke saath."
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- INPUT AREA -->
-
-      <div class="inputArea">
-
-        <textarea
-          id="prompt"
-          placeholder="Website kya banani hai? Example: Ek modern portfolio website banao..."
-          autocomplete="off"
-        ></textarea>
-
-
-        <button
-          id="generateBtn"
-          class="generateBtn"
-          type="button"
-        >
-          ✨ Generate Website
-        </button>
-
 
         <div
-          id="status"
-          class="status"
+          id="chat"
+          class="chat"
         >
-          Ready
+
+          <div class="ai-message">
+            👋 Hello! Mujhe batao tumhe
+            kaunsi website chahiye.
+          </div>
+
         </div>
 
-      </div>
+        <div class="input-area">
 
-    </aside>
+          <textarea
+            id="prompt"
+            placeholder="Example: mujhe ek modern gaming website bana ke do..."
+          ></textarea>
+
+          <button
+            id="generateBtn"
+            class="generate-btn"
+          >
+            🚀 Generate Website
+          </button>
+
+        </div>
+
+      </section>
 
 
+      <section class="preview-panel">
 
-    <!-- ================= CENTER PREVIEW ================= -->
-
-    <section class="previewPanel">
-
-      <div class="previewHeader">
-
-        <div class="previewTitle">
+        <div class="panel-title">
           🌐 Live Preview
         </div>
-
-
-        <div class="devices">
-
-          <button
-            class="device active"
-            data-width="100%"
-            type="button"
-          >
-            Desktop
-          </button>
-
-          <button
-            class="device"
-            data-width="768px"
-            type="button"
-          >
-            Tablet
-          </button>
-
-          <button
-            class="device"
-            data-width="390px"
-            type="button"
-          >
-            Mobile
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <div class="previewContainer">
 
         <iframe
           id="preview"
           title="Website Preview"
-          sandbox="allow-scripts allow-forms"
         ></iframe>
+
+      </section>
+
+
+      <section class="code-panel">
+
+        <div class="panel-title">
+          💻 Generated Code
+        </div>
+
+        <div class="code-tabs">
+
+          <button
+            class="code-tab active"
+            data-code="html"
+          >
+            HTML
+          </button>
+
+          <button
+            class="code-tab"
+            data-code="css"
+          >
+            CSS
+          </button>
+
+          <button
+            class="code-tab"
+            data-code="js"
+          >
+            JavaScript
+          </button>
+
+        </div>
+
+        <pre
+          id="codeOutput"
+        >No code generated yet.</pre>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <!-- VIDEO BUILDER -->
+
+  <main
+    id="videoSection"
+    class="section hidden"
+  >
+
+    <div class="page-title">
+      🎬 AI Image → Video
+    </div>
+
+    <div class="video-builder">
+
+      <div class="upload-card">
+
+        <h2>
+          📷 Upload Your Image
+        </h2>
+
+        <div
+          id="dropArea"
+          class="drop-area"
+        >
+
+          <div
+            id="uploadText"
+          >
+            📷 Click to upload image
+          </div>
+
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/png,image/jpeg,image/webp"
+            hidden
+          >
+
+        </div>
+
+        <img
+          id="imagePreview"
+          class="image-preview hidden"
+          alt="Preview"
+        >
 
       </div>
 
-    </section>
+
+      <div class="video-settings">
+
+        <h2>
+          🎬 Video Settings
+        </h2>
+
+        <label>
+          Describe your video
+        </label>
+
+        <textarea
+          id="videoPrompt"
+          placeholder="Example: person slowly walks toward the camera, cinematic camera movement, realistic motion, wind moving clothes..."
+        ></textarea>
+
+        <label>
+          Video Ratio
+        </label>
+
+        <select
+          id="aspectRatio"
+        >
+          <option value="9:16">
+            9:16 Portrait
+          </option>
+
+          <option value="16:9">
+            16:9 Landscape
+          </option>
+        </select>
+
+        <button
+          id="videoBtn"
+          class="video-btn"
+        >
+          🚀 Generate Video
+        </button>
+
+        <div
+          id="videoStatus"
+          class="video-status"
+        ></div>
+
+      </div>
 
 
+      <div class="result-card">
 
-    <!-- ================= RIGHT CODE PANEL ================= -->
+        <h2>
+          🎥 Generated Video
+        </h2>
 
-    <aside class="codePanel">
-
-      <div class="panelHeader">
-
-        <div class="panelTitle">
-          💻 Generated Code
+        <div
+          id="videoResult"
+          class="video-result"
+        >
+          Video yahan show hoga.
         </div>
 
       </div>
 
-
-      <!-- TABS -->
-
-      <div class="tabs">
-
-        <button
-          class="tab active"
-          data-tab="html"
-          type="button"
-        >
-          HTML
-        </button>
-
-        <button
-          class="tab"
-          data-tab="css"
-          type="button"
-        >
-          CSS
-        </button>
-
-        <button
-          class="tab"
-          data-tab="js"
-          type="button"
-        >
-          JavaScript
-        </button>
-
-      </div>
-
-
-      <!-- CODE -->
-
-      <pre id="code"><code>Generate a website to see the code here...</code></pre>
-
-    </aside>
+    </div>
 
   </main>
 
@@ -241,4 +269,5 @@
   <script src="app.js"></script>
 
 </body>
+
 </html>
