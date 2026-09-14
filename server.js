@@ -1,8 +1,11 @@
 import "dotenv/config";
 import express from "express";
+import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,32 +13,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ========================================
-// GEMINI
-// ========================================
-
-if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY missing.");
-}
-
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY
 });
 
-// ========================================
-// EXPRESS
-// ========================================
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024
+  }
+});
 
 app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-// IMPORTANT:
-// Your index.html, style.css and app.js
-// are in the ROOT folder.
+// Root files
 app.use(express.static(__dirname));
 
-// ========================================
-// AI SYSTEM PROMPT
-// ========================================
+// Generated video folder
+const generatedFolder = path.join(__dirname, "generated");
+
+if (!fs.existsSync(generatedFolder)) {
+  fs.mkdirSync(generatedFolder, { recursive: true });
+}
+
+// ==========================================
+// WEBSITE AI
+// ==========================================
 
 const SYSTEM_PROMPT = `
 You are CODE AI, an expert AI website builder.
@@ -43,10 +47,10 @@ You are CODE AI, an expert AI website builder.
 Create complete websites from the user's request.
 
 You can create:
-- Portfolio websites
+- Portfolio
 - Gaming websites
 - Business websites
-- Ecommerce websites
+- Ecommerce
 - Restaurant websites
 - Login pages
 - Dashboards
@@ -54,7 +58,7 @@ You can create:
 - School websites
 - Shop websites
 - Calculator websites
-- Tools websites
+- Tools
 - AI websites
 - Game websites
 - Animation websites
@@ -67,74 +71,46 @@ HTML RULES:
 
 CSS RULES:
 - Return complete CSS.
-- Make the website modern and professional.
-- Make it responsive on desktop, tablet and mobile.
+- Modern professional design.
+- Responsive desktop, tablet and mobile.
 
 JAVASCRIPT RULES:
 - Browser JavaScript only.
 - Do not use Node.js.
 - Do not use eval().
 - Buttons should work.
-- Forms should work where possible.
+- Forms should work.
 - Navigation should work.
 - Interactive features should work.
-
-DESIGN:
-- Modern UI.
-- Professional layout.
-- Good spacing.
-- Good typography.
-- Smooth animations where useful.
-- Responsive design.
-- Attractive colors.
-- Good mobile layout.
 
 SECURITY:
 - Never expose API keys.
 - Never create secret keys.
 - Never put backend secrets inside generated code.
 
-If the user asks to modify an existing website:
-- Keep useful existing features.
-- Modify according to the new request.
-- Do not unnecessarily remove working features.
-
 OUTPUT:
 Return ONLY valid JSON.
-Do not return Markdown.
-Do not return code fences.
-Do not add explanations outside JSON.
 `;
-
-// ========================================
-// JSON SCHEMA
-// ========================================
 
 const WEBSITE_SCHEMA = {
   type: "object",
-
   properties: {
     html: {
       type: "string"
     },
-
     css: {
       type: "string"
     },
-
     js: {
       type: "string"
     },
-
     title: {
       type: "string"
     },
-
     message: {
       type: "string"
     }
   },
-
   required: [
     "html",
     "css",
@@ -144,11 +120,7 @@ const WEBSITE_SCHEMA = {
   ]
 };
 
-// ========================================
-// GEMINI MODELS
-// ========================================
-
-const MODELS = [
+const WEBSITE_MODELS = [
   "gemini-3.8-flash",
   "gemini-3.7-flash",
   "gemini-3.6-flash",
@@ -156,19 +128,11 @@ const MODELS = [
   "gemini-2.5-flash-lite"
 ];
 
-// ========================================
-// WAIT
-// ========================================
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ========================================
-// RETRYABLE ERROR
-// ========================================
-
-function isRetryableError(error) {
+function retryable(error) {
   const message = String(
     error?.message || error || ""
   ).toLowerCase();
@@ -189,57 +153,34 @@ function isRetryableError(error) {
     message.includes("unavailable") ||
     message.includes("overloaded") ||
     message.includes("high demand") ||
-    message.includes("temporarily") ||
     message.includes("resource exhausted") ||
-    message.includes("rate limit") ||
-    message.includes("too many requests")
+    message.includes("rate limit")
   );
 }
 
-// ========================================
-// GEMINI REQUEST
-// ========================================
+async function generateWebsite(model, prompt) {
 
-async function generateWithModel(model, userPrompt) {
-  console.log(`🤖 Trying: ${model}`);
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+      temperature: 0.7,
+      maxOutputTokens: 30000,
+      responseMimeType: "application/json",
+      responseSchema: WEBSITE_SCHEMA
+    }
+  });
 
-  const response =
-    await ai.models.generateContent({
-      model: model,
-
-      contents: userPrompt,
-
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-
-        temperature: 0.7,
-
-        maxOutputTokens: 30000,
-
-        responseMimeType:
-          "application/json",
-
-        responseSchema:
-          WEBSITE_SCHEMA
-      }
-    });
-
-  const text = response?.text;
-
-  if (!text) {
-    throw new Error(
-      "Gemini ne empty response diya."
-    );
+  if (!response?.text) {
+    throw new Error("Gemini empty response.");
   }
 
-  return text.trim();
+  return response.text.trim();
 }
 
-// ========================================
-// CLEAN JSON
-// ========================================
-
 function cleanJSON(text) {
+
   let cleaned = String(text).trim();
 
   cleaned = cleaned
@@ -248,98 +189,33 @@ function cleanJSON(text) {
     .replace(/\s*```$/i, "")
     .trim();
 
-  const firstBrace =
-    cleaned.indexOf("{");
-
-  const lastBrace =
-    cleaned.lastIndexOf("}");
+  const first = cleaned.indexOf("{");
+  const last = cleaned.lastIndexOf("}");
 
   if (
-    firstBrace !== -1 &&
-    lastBrace !== -1 &&
-    lastBrace > firstBrace
+    first !== -1 &&
+    last !== -1 &&
+    last > first
   ) {
     cleaned = cleaned.slice(
-      firstBrace,
-      lastBrace + 1
+      first,
+      last + 1
     );
   }
 
   return cleaned;
 }
 
-// ========================================
-// PARSE JSON
-// ========================================
-
-function parseWebsite(text) {
-  const cleaned = cleanJSON(text);
-
-  try {
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("❌ JSON ERROR:");
-    console.error(error.message);
-    console.error("RAW RESPONSE:");
-    console.error(cleaned);
-
-    throw new Error(
-      "Gemini ne valid JSON return nahi kiya."
-    );
-  }
-}
-
-// ========================================
-// VALIDATE
-// ========================================
-
-function validateWebsite(result) {
-  if (!result) {
-    throw new Error(
-      "Gemini response empty hai."
-    );
-  }
-
-  if (typeof result.html !== "string") {
-    throw new Error(
-      "Gemini ne HTML generate nahi kiya."
-    );
-  }
-
-  if (typeof result.css !== "string") {
-    throw new Error(
-      "Gemini ne CSS generate nahi kiya."
-    );
-  }
-
-  if (typeof result.js !== "string") {
-    result.js = "";
-  }
-
-  if (typeof result.title !== "string") {
-    result.title = "AI Website";
-  }
-
-  if (typeof result.message !== "string") {
-    result.message =
-      "Website successfully generated.";
-  }
-
-  return result;
-}
-
-// ========================================
-// GENERATE WEBSITE
-// ========================================
-
 app.post("/api/generate", async (req, res) => {
+
   try {
+
     const {
       prompt,
       current
     } = req.body;
 
-    if (!prompt || !prompt.trim()) {
+    if (!prompt?.trim()) {
       return res.status(400).json({
         error: "Prompt empty hai."
       });
@@ -347,8 +223,7 @@ app.post("/api/generate", async (req, res) => {
 
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
-        error:
-          "GEMINI_API_KEY set nahi hai."
+        error: "GEMINI_API_KEY set nahi hai."
       });
     }
 
@@ -358,70 +233,70 @@ USER REQUEST:
 ${prompt.trim()}
 `;
 
-    // Existing project
     if (current) {
+
       userPrompt += `
 
 CURRENT WEBSITE:
 
 ${JSON.stringify(current)}
 
-The user wants to modify the current website.
+Modify the current website according to the user's request.
 
 Keep useful existing features.
-
-Modify the website according to the new request.
-
 Do not unnecessarily remove working features.
 `;
     }
 
-    console.log("");
-    console.log(
-      "======================================"
-    );
-    console.log(
-      "🚀 WEBSITE GENERATION STARTED"
-    );
-    console.log(
-      "======================================"
-    );
-
     let finalResult = null;
-    let successfulModel = null;
     let lastError = null;
 
-    // ====================================
-    // TRY ALL MODELS
-    // ====================================
+    for (const model of WEBSITE_MODELS) {
 
-    for (const model of MODELS) {
-
-      let success = false;
-
-      for (let attempt = 1; attempt <= 3; attempt++) {
+      for (
+        let attempt = 1;
+        attempt <= 3;
+        attempt++
+      ) {
 
         try {
+
           console.log(
-            `🤖 ${model} | Attempt ${attempt}/3`
+            `Website AI: ${model} attempt ${attempt}`
           );
 
           const text =
-            await generateWithModel(
+            await generateWebsite(
               model,
               userPrompt
             );
 
           const result =
-            parseWebsite(text);
+            JSON.parse(cleanJSON(text));
 
-          finalResult =
-            validateWebsite(result);
+          if (
+            typeof result.html !== "string" ||
+            typeof result.css !== "string"
+          ) {
+            throw new Error(
+              "Invalid website response."
+            );
+          }
 
-          successfulModel =
-            model;
-
-          success = true;
+          finalResult = {
+            html: result.html,
+            css: result.css,
+            js:
+              typeof result.js === "string"
+                ? result.js
+                : "",
+            title:
+              result.title ||
+              "AI Website",
+            message:
+              result.message ||
+              "Website generated."
+          };
 
           break;
 
@@ -430,115 +305,43 @@ Do not unnecessarily remove working features.
           lastError = error;
 
           console.error(
-            `❌ ${model} failed:`,
-            error?.message || error
+            `${model} failed:`,
+            error.message
           );
 
-          // Don't retry permanent errors
-          if (!isRetryableError(error)) {
+          if (!retryable(error)) {
             break;
           }
 
           if (attempt < 3) {
-
-            const delay =
-              1500 *
-              Math.pow(2, attempt - 1);
-
-            const jitter =
-              Math.floor(
-                Math.random() * 500
-              );
-
-            console.log(
-              `⏳ Retrying in ${
-                delay + jitter
-              }ms...`
-            );
-
             await sleep(
-              delay + jitter
+              1500 * Math.pow(
+                2,
+                attempt - 1
+              )
             );
           }
         }
       }
 
-      if (success) {
+      if (finalResult) {
         break;
       }
-
-      console.log(
-        `⚠️ ${model} unavailable.`
-      );
-
-      console.log(
-        "➡️ Trying next model..."
-      );
     }
-
-    // ====================================
-    // ALL FAILED
-    // ====================================
 
     if (!finalResult) {
 
-      console.error(
-        "❌ ALL GEMINI MODELS FAILED"
-      );
-
       return res.status(503).json({
         error:
-          "Gemini temporarily busy hai. Please thodi der baad try karo.\n\n" +
-          (lastError?.message || "")
+          "Gemini temporarily busy hai. Thodi der baad try karo."
       });
     }
 
-    // ====================================
-    // SUCCESS
-    // ====================================
-
-    console.log("");
-    console.log(
-      "======================================"
-    );
-    console.log(
-      "🎉 WEBSITE GENERATED"
-    );
-    console.log(
-      `🤖 Model: ${successfulModel}`
-    );
-    console.log(
-      `HTML: ${finalResult.html.length}`
-    );
-    console.log(
-      `CSS: ${finalResult.css.length}`
-    );
-    console.log(
-      `JS: ${finalResult.js.length}`
-    );
-    console.log(
-      "======================================"
-    );
-    console.log("");
-
-    return res.json({
-      html: finalResult.html,
-      css: finalResult.css,
-      js: finalResult.js,
-      title: finalResult.title,
-      message: finalResult.message
-    });
+    return res.json(finalResult);
 
   } catch (error) {
 
-    console.error("");
-    console.error(
-      "❌ SERVER ERROR"
-    );
-    console.error(
-      error
-    );
-    console.error("");
+    console.error(error);
 
     return res.status(500).json({
       error:
@@ -548,11 +351,258 @@ Do not unnecessarily remove working features.
   }
 });
 
-// ========================================
-// HOME PAGE
-// ========================================
+
+// ==========================================
+// IMAGE → VIDEO
+// ==========================================
+
+const videoJobs = new Map();
+
+
+// Start video generation
+app.post(
+  "/api/video",
+  upload.single("image"),
+  async (req, res) => {
+
+    try {
+
+      if (!process.env.GEMINI_API_KEY) {
+
+        return res.status(500).json({
+          error:
+            "GEMINI_API_KEY set nahi hai."
+        });
+      }
+
+      if (!req.file) {
+
+        return res.status(400).json({
+          error:
+            "Image upload karo."
+        });
+      }
+
+      const prompt =
+        req.body.prompt?.trim() ||
+        "Create a realistic cinematic video from this image. Natural movement, realistic camera motion, detailed environment.";
+
+      const aspectRatio =
+        req.body.aspectRatio === "9:16"
+          ? "9:16"
+          : "16:9";
+
+      const jobId =
+        crypto.randomUUID();
+
+      videoJobs.set(jobId, {
+        status: "generating",
+        progress: 5,
+        message:
+          "Video generation started..."
+      });
+
+      res.json({
+        success: true,
+        jobId
+      });
+
+      // Generate in background
+      generateVideoJob(
+        jobId,
+        req.file,
+        prompt,
+        aspectRatio
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Video start error:",
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          error?.message ||
+          "Video start nahi ho paya."
+      });
+    }
+  }
+);
+
+
+// Video generation worker
+async function generateVideoJob(
+  jobId,
+  file,
+  prompt,
+  aspectRatio
+) {
+
+  try {
+
+    videoJobs.set(jobId, {
+      status: "generating",
+      progress: 10,
+      message:
+        "AI video bana raha hai..."
+    });
+
+    console.log(
+      "🎬 Starting Veo video:",
+      jobId
+    );
+
+    const image = {
+      imageBytes:
+        file.buffer.toString("base64"),
+      mimeType:
+        file.mimetype || "image/jpeg"
+    };
+
+    let operation =
+      await ai.models.generateVideos({
+        model:
+          "veo-3.1-generate-preview",
+
+        prompt,
+
+        image,
+
+        config: {
+          aspectRatio,
+          numberOfVideos: 1,
+          resolution: "720p"
+        }
+      });
+
+    videoJobs.set(jobId, {
+      status: "generating",
+      progress: 20,
+      message:
+        "Veo video generate kar raha hai..."
+    });
+
+    // Poll
+    while (!operation.done) {
+
+      await sleep(10000);
+
+      operation =
+        await ai.operations
+          .getVideosOperation({
+            operation
+          });
+
+      videoJobs.set(jobId, {
+        status: "generating",
+        progress: 50,
+        message:
+          "Video processing ho raha hai..."
+      });
+
+      console.log(
+        "🎬 Video status:",
+        operation.done
+      );
+    }
+
+    if (
+      !operation.response ||
+      !operation.response.generatedVideos ||
+      !operation.response.generatedVideos.length
+    ) {
+
+      throw new Error(
+        "Veo ne video return nahi kiya."
+      );
+    }
+
+    const generatedVideo =
+      operation
+        .response
+        .generatedVideos[0]
+        .video;
+
+    const filename =
+      `${jobId}.mp4`;
+
+    const outputPath =
+      path.join(
+        generatedFolder,
+        filename
+      );
+
+    // Download generated video
+    await ai.files.download({
+      file: generatedVideo,
+      downloadPath: outputPath
+    });
+
+    const videoUrl =
+      `/generated/${filename}`;
+
+    videoJobs.set(jobId, {
+      status: "complete",
+      progress: 100,
+      message:
+        "Video successfully generated!",
+      videoUrl
+    });
+
+    console.log(
+      "🎉 VIDEO READY:",
+      videoUrl
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ VIDEO ERROR:",
+      error
+    );
+
+    videoJobs.set(jobId, {
+      status: "error",
+      progress: 100,
+      message:
+        error?.message ||
+        "Video generate nahi ho paya."
+    });
+  }
+}
+
+
+// Check video status
+app.get(
+  "/api/video/:jobId",
+  (req, res) => {
+
+    const job =
+      videoJobs.get(
+        req.params.jobId
+      );
+
+    if (!job) {
+
+      return res.status(404).json({
+        error:
+          "Video job nahi mila."
+      });
+    }
+
+    return res.json(job);
+  }
+);
+
+
+// ==========================================
+// HOME
+// ==========================================
 
 app.get("/", (req, res) => {
+
   res.sendFile(
     path.join(
       __dirname,
@@ -561,36 +611,34 @@ app.get("/", (req, res) => {
   );
 });
 
-// ========================================
-// START SERVER
-// ========================================
+
+// ==========================================
+// SERVER
+// ==========================================
 
 app.listen(PORT, () => {
 
   console.log("");
   console.log(
-    "======================================"
+    "================================"
   );
   console.log(
-    "          ⚡ CODE AI STARTED"
+    "       ⚡ CODE AI"
   );
   console.log(
-    "======================================"
+    "================================"
   );
   console.log(
     `🌐 Port: ${PORT}`
   );
   console.log(
-    "🤖 Gemini AI Ready"
+    "🤖 Website AI: ON"
   );
   console.log(
-    "🔄 Automatic Retry: ON"
+    "🎬 Image → Video: ON"
   );
   console.log(
-    "🔀 Model Fallback: ON"
-  );
-  console.log(
-    "======================================"
+    "================================"
   );
   console.log("");
 });
